@@ -11,8 +11,9 @@ void send_bit(bool one, struct config *config)
 	CYCLES start_t = cc_sync();
 	if (one) {
 		// Repeatedly flush addr
+		ADDR_PTR addr = config->addr;
 		while ((get_time() - start_t) < config->interval) {
-				// TODO: send over channel
+				clflush(addr);
 		}	
 
 	} else {

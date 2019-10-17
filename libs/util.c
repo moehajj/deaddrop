@@ -1,6 +1,39 @@
 
 #include "util.h"
 
+/*
+ * Loads from virtual address addr and measure the access time
+ */
+CYCLES mem_access(ADDR_PTR addr)
+{
+    CYCLES cycles;
+
+    asm volatile("mov %1, %%r8\n\t"
+            "lfence\n\t"
+            "rdtsc\n\t"
+            "mov %%eax, %%edi\n\t"
+            "mov (%%r8), %%r8\n\t"
+            "lfence\n\t"
+            "rdtsc\n\t"
+            "sub %%edi, %%eax\n\t"
+    : "=a"(cycles) /*output*/
+    : "r"(addr)
+    : "r8", "edi");
+
+    return cycles;
+}
+
+
+/*
+ * Flushes the cache block accessed by a virtual address out of the cache
+ */
+extern inline __attribute__((always_inline))
+void clflush(ADDR_PTR addr)
+{
+    asm volatile ("clflush (%0)"::"r"(addr));
+}
+
+
 /* 
  * Returns Time Stamp Counter 
  */
@@ -92,12 +125,31 @@ void print_help() {
 }
 
 /*
+ * Returns the 10 bits cache set index of a given address.
+ */
+uint64_t get_cache_set_index(ADDR_PTR phys_addr)
+{
+    uint64_t mask = ((uint64_t) 1 << 16) - 1;
+    return (phys_addr & mask) >> 6;
+}
+
+/*
  * Parses the arguments and flags of the program and initializes the struct config
  * with those parameters (or the default ones if no custom flags are given).
  */
 void init_config(struct config *config, int argc, char **argv)
 {
+		int *data = (int*) malloc(64*64*64);
+
 		config->interval = CHANNEL_SENDING_INTERVAL;
+
+		int *addr = data;
+		while(get_cache_set_index((ADDR_PTR) addr)) {
+			addr += 64;
+		}
+	
+		config->addr = (ADDR_PTR) addr;
+
 		/*
 	// Parse the command line flags
 	int option;

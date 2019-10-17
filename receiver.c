@@ -1,6 +1,6 @@
 #include "util.h"
 
-#define CHANNEL_THRESHOLD 10
+#define CHANNEL_THRESHOLD 100
 
 /*
  * Detects a bit by repeatedly measuring the access time
@@ -11,24 +11,23 @@
  */
 bool detect_bit(struct config *config)
 {
-		int ones = 0;
-		int zeros = 0;
+		int hits = 0;
+		int misses = 0;
 
 	// Sync with sender
 	CYCLES start_t = cc_sync();
 	while ((get_time() - start_t) < config->interval) {
-		// TODO: read channel and measure access time
-		CYCLES access_time = 0;
+		CYCLES access_time = mem_access(config->addr);
 
 		// Check if detected 1 or 0
 		if (access_time > CHANNEL_THRESHOLD) {
-			ones++;
+			misses++;
 		} else {
-			zeros++;
+			hits++;
 		}
 	}
 
-	return ones >= zeros;
+	return misses >= hits;
 }
 
 int main(int argc, char **argv)

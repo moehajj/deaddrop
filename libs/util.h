@@ -20,6 +20,7 @@
 #define UTIL_H_
 
 #define CYCLES uint32_t
+#define ADDR_PTR uint64_t
 
 #define CHANNEL_SENDING_INTERVAL        0x00008000
 #define CHANNEL_SYNC_TIMEMASK           0x000FFFFF
@@ -30,16 +31,24 @@
 
 struct config {
 	int interval;
+	ADDR_PTR addr;
 };
 
+CYCLES mem_access(ADDR_PTR addr);
 CYCLES rdtscp(void);
 CYCLES get_time();
 CYCLES cc_sync();
- 
+
+
+void clflush(ADDR_PTR addr);
+
 char *string_to_binary(char *s);
 
 char *conv_char(char *data, int size, char *msg);
 
 void init_config(struct config *config, int argc, char **argv);
+
+
+
 
 #endif
