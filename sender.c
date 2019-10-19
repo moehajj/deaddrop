@@ -1,4 +1,5 @@
 #include "util.h"
+#include "sender.h"
 
 /*
  * For a clock length of config->interval,
@@ -67,14 +68,3 @@ int main(int argc, char **argv) {
 	printf("Sender finished\n");
 	return 0;
 }
-
-
-
-
-
-
-
-
-
-
-

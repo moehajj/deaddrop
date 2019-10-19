@@ -1,4 +1,5 @@
 #include "util.h"
+#include "receiver.h"
 
 #define CHANNEL_THRESHOLD 100
 
@@ -81,5 +82,3 @@ int main(int argc, char **argv)
 	printf("Receiver finished\n");
 	return 0;
 }
-
-

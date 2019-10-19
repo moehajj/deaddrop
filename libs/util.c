@@ -13,8 +13,8 @@ CYCLES mem_access(ADDR_PTR addr)
             "rdtsc\n\t"
             "mov %%eax, %%edi\n\t"
             "mov (%%r8), %%r8\n\t"
-            "lfence\n\t"
-            "rdtsc\n\t"
+            /*"lfence\n\t"*/
+            "rdtscp\n\t"
             "sub %%edi, %%eax\n\t"
     : "=a"(cycles) /*output*/
     : "r"(addr)
@@ -30,7 +30,7 @@ CYCLES mem_access(ADDR_PTR addr)
 extern inline __attribute__((always_inline))
 void clflush(ADDR_PTR addr)
 {
-    asm volatile ("clflush (%0)"::"r"(addr));
+    asm volatile ("clflushopt (%0)"::"r"(addr));
 }
 
 
@@ -144,9 +144,9 @@ void init_config(struct config *config, int argc, char **argv)
 		config->interval = CHANNEL_SENDING_INTERVAL;
 
 		int *addr = data;
-		while(get_cache_set_index((ADDR_PTR) addr)) {
-			addr += 64;
-		}
+        while(get_cache_set_index((ADDR_PTR) addr)) {
+            addr += 64;
+        }
 	
 		config->addr = (ADDR_PTR) addr;
 
