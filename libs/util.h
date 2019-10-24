@@ -22,8 +22,14 @@
 #define CYCLES uint32_t
 #define ADDR_PTR uint64_t
 
-#define CHANNEL_SENDING_INTERVAL        0x00009000
+#ifdef DUPLEX_MODE
+#define CHANNEL_SENDING_INTERVAL        0x00009FFFF
+#define CHANNEL_SYNC_TIMEMASK           0x0000FFFFF
+#else
+#define CHANNEL_SENDING_INTERVAL        0x00009FFF
 #define CHANNEL_SYNC_TIMEMASK           0x0000FFFF
+#endif
+
 #define CHANNEL_SYNC_JITTER             0x0100
 
 #define MAX_BUFFER_LEN	1024

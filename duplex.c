@@ -10,23 +10,26 @@ char RECV_BUF[128];
 const char frame_start_seq = '\xab';
 
 void*
-read_from_stdin() {
+read_from_stdin()
+{
     while (true) {
         fflush(stdout);
-        printf("\n< ");
+        printf("\nSend < ");
         SND_BUF[0] = frame_start_seq;
         fgets(SND_BUF + 1, sizeof(SND_BUF), stdin);
         READY = 1;
 
-        while (READY) { };
+        while (READY) {
+        };
     }
 }
 
-
-int main(int argc, char** argv) {
-	// Initialize config and local variables
-	struct config config;
-	init_config(&config, argc, argv);
+int
+main(int argc, char** argv)
+{
+    // Initialize config and local variables
+    struct config config;
+    init_config(&config, argc, argv);
 
     char* msg = NULL;
     size_t msg_len = 0;
@@ -43,16 +46,14 @@ int main(int argc, char** argv) {
     char cur_char = 0;
     pthread_t reader_thread;
 
-    printf("Ready: %d\n", CSTATE);
-
     pthread_create(&reader_thread, NULL, read_from_stdin, NULL);
 
     while (true) {
         CYCLES start_t = cc_sync();
-        // TODO: Choose the granularity of 1 epoch and extract the nth bit to
+        // Choose the granularity of 1 epoch and extract the nth bit to
         // alternate between modes.
         int misses = 0, hits = 0;
-        int mode = ((start_t >> 20) & 1) ^ CSTATE;
+        int mode = ((start_t >> 21) & 1) ^ CSTATE;
         bool bit;
 
         fflush(stdout);
@@ -67,10 +68,11 @@ int main(int argc, char** argv) {
                 //     2.a. We've send a part of the message, therefore, the
                 //          iterator and current buffer and non-zero.
                 //     2.b. We have a brand new message!
-                if (!READY) continue;
+                if (!READY)
+                    continue;
 
                 if (send_iter == 0) {
-		            msg = string_to_binary(SND_BUF);
+                    msg = string_to_binary(SND_BUF);
                     msg_len = strlen(msg);
                 }
 
@@ -78,10 +80,11 @@ int main(int argc, char** argv) {
                     // Repeatedly flush addr
                     while ((get_time() - start_t) < config.interval) {
                         clflush(addr);
-                    }	
+                    }
                 } else {
                     // Do Nothing
-                    while (get_time() - start_t < config.interval) { }
+                    while (get_time() - start_t < config.interval) {
+                    }
                 }
 
                 send_iter += 1;
@@ -112,9 +115,9 @@ int main(int argc, char** argv) {
 
                 bit = misses >= hits;
 
-                if (bit_sequence == (uint8_t) frame_start_seq) {
+                if (bit_sequence == (uint8_t)frame_start_seq) {
                     // Add the bit to the message being assembled
-                    cur_char = ((uint8_t) cur_char << 1) | bit;
+                    cur_char = ((uint8_t)cur_char << 1) | bit;
                     recv_iter += 1;
                     if (recv_iter % 8 != 0) {
                         // We haven't assembled a full byte just yet.
@@ -122,18 +125,18 @@ int main(int argc, char** argv) {
                     }
 
                     // We have a full character worth of bytes now!
-                    RECV_BUF[(recv_iter / 8) - 1] = (char) cur_char;
+                    RECV_BUF[(recv_iter / 8) - 1] = (char)cur_char;
                     if (cur_char == '\0') {
                         // NULL byte, end-of-message
                         bit_sequence = 0;
                         recv_iter = 0;
-                        printf ("\nR> %s\n", RECV_BUF);
+                        printf("\nReceived > %s\n", RECV_BUF);
                     }
 
-                    cur_char = (char) 0;
+                    cur_char = (char)0;
                 } else {
                     // Detect frame start
-                    bit_sequence = ((uint8_t) bit_sequence << 1) | bit;
+                    bit_sequence = ((uint8_t)bit_sequence << 1) | bit;
                     cur_char = 0;
                 }
                 break;

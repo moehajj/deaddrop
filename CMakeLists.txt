@@ -15,9 +15,9 @@ target_link_libraries (receiver LINK_PUBLIC util)
 find_package(Threads REQUIRED)
 
 add_executable(duplex duplex.c)
-target_link_libraries(duplex LINK_PUBLIC Threads::Threads util)
-target_compile_definitions(duplex PRIVATE CSTATE_IDENT=0)
+target_link_libraries(duplex LINK_PUBLIC Threads::Threads util_duplex)
+target_compile_definitions(duplex PRIVATE CSTATE_IDENT=0 DUPLEX_MODE=1)
 
 add_executable(duplex2 duplex.c)
-target_link_libraries(duplex2 LINK_PUBLIC Threads::Threads util)
-target_compile_definitions(duplex2 PRIVATE CSTATE_IDENT=1)
+target_link_libraries(duplex2 LINK_PUBLIC Threads::Threads util_duplex)
+target_compile_definitions(duplex2 PRIVATE CSTATE_IDENT=1 DUPLEX_MODE=1)

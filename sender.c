@@ -35,9 +35,9 @@ int main(int argc, char **argv) {
 
 	printf("Please type a message (exit to stop).\n");
 	while (sending) {
-        cc_sync();
-        clflush(config.addr);
-        continue;
+        /*cc_sync();*/
+        /*clflush(config.addr);*/
+        /*continue;*/
 
 		// Get a message to send from the user
 		printf("< ");
