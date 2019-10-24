@@ -19,13 +19,17 @@ bool detect_bit(struct config *config)
 	CYCLES start_t = cc_sync();
 	while ((get_time() - start_t) < config->interval) {
 		CYCLES access_time = mem_access(config->addr);
-
+        printf("%d\n", access_time);
 		// Check if detected 1 or 0
 		if (access_time > CHANNEL_THRESHOLD) {
 			misses++;
 		} else {
 			hits++;
 		}
+
+	    CYCLES s_t = get_time();
+	    while ((get_time() - s_t) < 250);
+
 	}
 
 	return misses >= hits;

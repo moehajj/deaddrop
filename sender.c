@@ -29,10 +29,15 @@ int main(int argc, char **argv) {
 	init_config(&config, argc, argv);
 	int sending = 1;
 
+    clock_t start_t, end_t;
+
 	bool sequence[8] = {1,0,1,0,1,0,1,1};
 
 	printf("Please type a message (exit to stop).\n");
 	while (sending) {
+        cc_sync();
+        clflush(config.addr);
+        continue;
 
 		// Get a message to send from the user
 		printf("< ");
@@ -55,6 +60,7 @@ int main(int argc, char **argv) {
 
 		// Send the message bit by bit
 		size_t msg_len = strlen(msg);
+        start_t = clock();
 		for (int ind = 0; ind < msg_len; ind++) {
 			if (msg[ind] == '0') {
 				send_bit(false, &config);
@@ -62,7 +68,9 @@ int main(int argc, char **argv) {
 				send_bit(true, &config);
 			}
 		}
+        end_t = clock();
 
+        printf("Bitrate: %.2f Bytes/second\n", ((double) msg_len) / ((double) (end_t - start_t) / CLOCKS_PER_SEC));
 	}
 
 	printf("Sender finished\n");
