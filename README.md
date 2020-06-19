@@ -3,6 +3,8 @@
 Implements cross-core, high-bandwidth (~40000 Bytes/s in our testing),
 covert-channel using flush-reload on LLC exploiting zero pages.
 
+Course lab project for UIUC [CS 598CLF Secure Processor Design](http://cwfletcher.net/598fa19.html).
+
 ## Build
 
 ```sh
